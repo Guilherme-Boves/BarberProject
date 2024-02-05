@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  password String
+  agendamentos Agendamento[]
+
+  @@map("admins")
+}
+
+model User {
+  id String @id @default(uuid())
+  name String
+  phone String
+  agendamentos Agendamento[]
+
+  @@map("users")
+}
+
+model Servico {
+  id String @id @default(uuid())
+  name String
+  price Decimal @db.Decimal(10,2)
+  agendamentos Agendamento_Servico[]
+
+  @@map("servicos")
+}
+
+model Agendamento {
+  id String @id @default(uuid())
+  barberId String
+  clientId String
+  date DateTime
+
+  agendamentos Agendamento_Servico[]
+
+  barber Admin @relation(fields: [barberId], references: [id])
+  client User @relation(fields: [clientId], references: [id])
+
+  @@map("agendamentos")
+}
+
+model Agendamento_Servico {
+  id String @id @default(uuid())
+  agendamentoId String  
+  servicoId String
+    
+  agendamento Agendamento @relation(fields: [agendamentoId], references: [id]) 
+  servico Servico @relation(fields: [servicoId], references: [id])
+
+  @@map("agendamento_servico")
+}
